@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:vm="using:TCPChatGUI.ViewModels"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Width="400" Height="500" Padding="4"
+        x:Class="TCPChatGUI.Views.Chat"
+        x:DataType="vm:ChatViewModel"
+        Title="Chatting with [user]"
+        Theme="{StaticResource ClassicWindow}">
+
+
+    <!-- We give a name to the root grid in order to access it later -->
+    <Grid RowDefinitions="Auto, *, Auto"
+          x:Name="Root">
+
+        <ScrollViewer Grid.Row="1" Background="#008282" Margin="0, 4" Padding="4">
+            <!-- This ItemsControl show all added ToDoItems. -->
+            <!-- It needs to be placed inside a ScrollViewer because other than a ListBox it has not its own -->
+            <ItemsControl ItemsSource="{Binding Messages}">
+                <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Margin="0,4">
+                    <TextBlock Text="{Binding Username}" FontWeight="Bold" Foreground="White" />
+                    <TextBlock Text="{Binding Content}" Foreground="White" />
+                    <TextBlock Text="{Binding Time, StringFormat='HH:mm:ss'}" 
+                              Foreground="White" FontSize="8" />
+                </StackPanel>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- This TextBox can be used to add new ToDoItems -->
+        <TextBox Grid.Row="2"
+         Text="{Binding NewMessageContent}"
+         Watermark="Add a new Message">
+            <TextBox.InnerRightContent>
+                <Button Command="{Binding AddMessageCommand}" >
+                    Send
+                <!-- <PathIcon Data="{DynamicResource AcceptIconData}" Foreground="Green" /> -->
+                </Button>
+            </TextBox.InnerRightContent>
+    <!--      KeyBindings allow us to define keyboard gestures  -->
+            <TextBox.KeyBindings>
+                <KeyBinding Command="{Binding AddMessageCommand}" Gesture="Enter" />
+            </TextBox.KeyBindings>
+        </TextBox>
+    </Grid>
+</Window>

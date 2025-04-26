@@ -1,0 +1,55 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TCPChatGUI.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="400" Height="500" Padding="4"
+        x:Class="TCPChatGUI.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="TCPChatGUI"
+        Theme="{StaticResource ClassicWindow}">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+<!-- 
+    <TextBlock Text="Text" HorizontalAlignment="Center" VerticalAlignment="Center"/> -->
+    <StackPanel>
+
+        <TextBox Text="{Binding InputIPString}"
+            Watermark="000.0.0.0"></TextBox> 
+        <TextBox Text="{Binding InputPortString}" 
+            Watermark="00000"></TextBox>
+        <Button Command="{Binding ConnectCommand}">Connect</Button>
+
+
+
+    <TextBlock Text="{Binding IpLabel}"></TextBlock>
+    <TextBlock Text="{Binding PortLabel}"></TextBlock>
+    <Button Command="{Binding InitializeServerCommand}">Initialize Server</Button>
+
+
+
+
+    <!-- <Grid Margin="5" 
+    ColumnDefinitions="120, 100" 
+    RowDefinitions="Auto, Auto, Auto">
+    <Label Grid.Row="0" Grid.Column="0" Margin="10">Celsius</Label>
+    <TextBox Name="Celsius" Grid.Row="0" Grid.Column="1" Margin="0 5" Text="0" TextChanged="TextBox_OnTextChanged"/>
+    <Label Grid.Row="1" Grid.Column="0" Margin="10">Fahrenheit</Label>
+    <TextBox IsReadOnly="True" Name="Fahrenheit" Grid.Row="1"  Grid.Column="1" Margin="0 5" Text="0"/>
+    <Button Grid.Row="2"  Grid.Column="1" Click="Button_OnClick">Calculate</Button>
+</Grid> -->
+
+    </StackPanel>
+
+</Window>
+
+
+
+
+
+
