@@ -67,3 +67,4 @@
 /home/douglas/Documentos/Acadêmico/UNIP/APS-5Sem/TCPChatGUI/obj/Debug/net9.0/ref/TCPChatGUI.dll
 /home/douglas/Documentos/Acadêmico/UNIP/APS-5Sem/TCPChatGUI/bin/Debug/net9.0/Classic.Avalonia.Theme.dll
 /home/douglas/Documentos/Acadêmico/UNIP/APS-5Sem/TCPChatGUI/bin/Debug/net9.0/Classic.CommonControls.Avalonia.dll
+/home/douglas/Documentos/Acadêmico/UNIP/APS-5Sem/TCPChatGUI/obj/Debug/net9.0/TCPChatGUI.sourcelink.json

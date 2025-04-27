@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TCPChatGUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+38c014c4495f9a461c09562ff27623f14ed63da3")]
 [assembly: System.Reflection.AssemblyProductAttribute("TCPChatGUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TCPChatGUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
