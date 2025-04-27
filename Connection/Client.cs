@@ -7,19 +7,16 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace TCPChatGUI.Connection;
 
-public class ChatClient
+public class ChatClient : TcpClient
 {
-    public TcpClient Client { get; private set; }
+    private bool _isDead = false;
 
-
-    public ChatClient()
-    {
-        Client = new();
-    }
-
+    public bool IsDead {get => _isDead;}
+   
     /// <summary>
     /// Tenta se conectar a um socket TCP específico (servidor).
     /// Emite um evento <see cref="OnClientConnected"/> em caso de sucesso.
@@ -35,8 +32,8 @@ public class ChatClient
         try
         {
             Client.Connect(iPEndPoint);
-            NetworkStream Stream = Client.GetStream();
-            ConfigureKeepAlive(Client.Client);
+            NetworkStream Stream = GetStream();
+            ConfigureKeepAlive(Client);
 
             Debug.WriteLine("Connected to server.");
 
@@ -85,9 +82,14 @@ public class ChatClient
         ConnectToServer(new IPEndPoint(iPAddress, port));
     }
 
+    new public void Dispose(bool disposing)
+    {
+        _isDead = true;
+        base.Dispose(disposing);
+    }
 
 
-    private void ConfigureKeepAlive(Socket socket)
+    private static void ConfigureKeepAlive(Socket socket)
     {
 
         socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
@@ -102,7 +104,7 @@ public class ChatClient
         }
     }
 
-    private void ConfigureWindowsKeepAlive(Socket socket)
+    private static void ConfigureWindowsKeepAlive(Socket socket)
     {
         uint time = 30000;
         uint interval = 5000;
@@ -119,7 +121,7 @@ public class ChatClient
     }
 
 
-    private void ConfigureUnixKeepAlive(Socket socket)
+    private static void ConfigureUnixKeepAlive(Socket socket)
     {
         int tcpKeepIdle = 30;
         int tcpKeepIntvl = 5;
