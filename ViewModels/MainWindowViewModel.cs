@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -16,25 +17,21 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<ChatConnection> Connections { get; } = [];
 
-    // TODO: Criar lista de clientes (cada cliente só pode se conectar a um servidor por vez)
+    private readonly ObservableCollection<ChatClient> _clients = [];
 
 
     [ObservableProperty]
-    private ChatServer _ChatServer;
-
-
-    [ObservableProperty]
-    private ChatClient _ChatClient;
+    private ChatServer _chatServer;
 
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IpLabel))]
-    private IPAddress? _Ip;
+    private IPAddress? _ip;
 
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PortLabel))]
-    private int? _Port;
+    private int? _port;
 
 
     [ObservableProperty]
@@ -55,10 +52,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         ChatServer = new ChatServer();
-        ChatClient = new ChatClient();
-
         ChatServer.ClientConnected += OnClientConnected;
-        ChatClient.ClientConnected += OnClientConnected;
     }
 
 
@@ -87,7 +81,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var ipAddress = IPAddress.Parse(InputIPString);
         var port = int.Parse(InputPortString);
-        ChatClient.ConnectToServer(ipAddress, port);
+        GetAvailableClient().ConnectToServer(ipAddress, port);
     }
 
 
@@ -98,12 +92,32 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public async Task InitializeServer()
     {
-
         await ChatServer.CreateServer();
         Ip = ChatServer.ServerIp;
         Port = ChatServer.ServerPort;
         await ChatServer.AcceptClient();
+    }
 
+    
+    public ChatClient CreateClient()
+    {
+        var newClient = new ChatClient();
+        newClient.ClientConnected += OnClientConnected;
+        return newClient;
+    }
+
+
+    public void DisposeClient(ChatClient client)
+    {
+        client.ClientConnected -= OnClientConnected;
+        client.Dispose(true);
+        _clients.Remove(client);
+    }
+
+    public void DisposeServer(ChatServer server)
+    {   
+        server.Dispose();
+        server.ClientConnected -= OnClientConnected;
     }
 
 
@@ -127,13 +141,41 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
 
-
-    public void Dispose()
+    /// <summary>
+    /// Descarta clientes mortos e retorna um <see cref="ChatClient"/> disponível para conexão da lista de clientes.
+    /// Se nenhum cliente estiver disponível, cria um novo e o retorna.
+    /// </summary>
+    /// <returns></returns>
+    private ChatClient GetAvailableClient()
     {
-        ChatServer.ClientConnected -= OnClientConnected;
-        ChatClient.ClientConnected -= OnClientConnected;
+        // Instancia um novo cliente caso a lista não contenha nenhum.
+        if (_clients.Count == 0)
+        {
+            _clients.Add(CreateClient());
+            return _clients[0];
+        }
+
+        // Itera sobre a lista e seleciona um cliente que NÃO esteja conectado e que NÃO esteja morto.
+        foreach (var client in _clients)
+        {
+            if (!client.Connected)
+            {
+                if (client.IsDead)
+                {
+                    // Descarta clientes mortos.
+                    DisposeClient(client);
+                }
+                else
+                {
+                    return client;
+                }
+            }
+        }
+
+        // Instancia um novo cliente pois nenhum outro estava disponível.
+        var newClient = CreateClient();
+        _clients.Add(newClient);
+        return newClient;
     }
-
-
 
 }
