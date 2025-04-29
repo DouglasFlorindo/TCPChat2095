@@ -1,10 +1,12 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace TCPChatGUI.Connection;
@@ -16,6 +18,9 @@ public partial class ChatConnection : ObservableObject
 {
     [ObservableProperty]
     private NetworkStream _stream;
+
+    [ObservableProperty]
+    private IPEndPoint _connectionEndPoint;
 
     private readonly StreamReader _textReader;
 
@@ -29,10 +34,11 @@ public partial class ChatConnection : ObservableObject
     private bool _disposed;
 
     
-    public ChatConnection(NetworkStream stream)
+    public ChatConnection(NetworkStream stream, IPEndPoint endPoint)
     {
         Debug.WriteLine("Connection established.");
         Stream = stream;
+        ConnectionEndPoint = endPoint;
 
 
         _textReader = new(Stream, Encoding.UTF8, leaveOpen: true);
