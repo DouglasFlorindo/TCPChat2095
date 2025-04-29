@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Avalonia.Media;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -81,6 +82,18 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var ipAddress = IPAddress.Parse(InputIPString);
         var port = int.Parse(InputPortString);
+        var targetEndPoint = new IPEndPoint(ipAddress, port);
+
+        // Verifica as conexões existentes.
+        foreach (var connection in Connections)
+        {
+            var connEndPoint = connection.ConnectionEndPoint;
+            // Não conecta em servidores que já está conectado.
+            if (targetEndPoint.Equals(connEndPoint))
+            {
+                throw new InvalidOperationException("Already connected to that server.");
+            }
+        }
         GetAvailableClient().ConnectToServer(ipAddress, port);
     }
 
@@ -128,7 +141,7 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <param name="e"></param>
     private async void OnClientConnected(object? sender, ClientConnectedEventArgs e)
     {
-        var connection = new ChatConnection(e.Stream);
+        var connection = new ChatConnection(e.Stream, e.EndPoint);
         // TODO: lógica de remoção de conexões; instanciar novo cliente;
         Connections.Add(connection);
 
