@@ -40,7 +40,7 @@ public partial class ChatServer : ObservableObject, IDisposable
         IPHostEntry localhost = await Dns.GetHostEntryAsync(hostName);
         var ipAddresses = localhost.AddressList;
 
-        IPAddress localIpAddress = ipAddresses[0];
+        IPAddress localIpAddress = ipAddresses[1];
 
         int port = 11000;
         bool isBound = false;

@@ -27,6 +27,7 @@ public class ChatClient : TcpClient
         // Lança um erro caso iPEndPoint seja nulo.
         ArgumentNullException.ThrowIfNull(iPEndPoint);
 
+        // MARK: Tratar conexão já existente
         Debug.WriteLine($"Connecting to {iPEndPoint.Address}:{iPEndPoint.Port}...");
         
         try
