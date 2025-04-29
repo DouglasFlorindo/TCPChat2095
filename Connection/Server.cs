@@ -131,7 +131,7 @@ public partial class ChatServer : ObservableObject, IDisposable
         ConfigureKeepAlive(client.Client);
         _clients.Add(client);
         var stream = client.GetStream();
-        OnClientConnected(stream);
+        OnClientConnected(stream, _endPoint);
     }
 
 
@@ -179,9 +179,9 @@ public partial class ChatServer : ObservableObject, IDisposable
     }
 
 
-    protected virtual void OnClientConnected(NetworkStream stream)
+    protected virtual void OnClientConnected(NetworkStream stream, IPEndPoint iPEndPoint)
     {
-        ClientConnected?.Invoke(this, new ClientConnectedEventArgs(stream));
+        ClientConnected?.Invoke(this, new ClientConnectedEventArgs(stream, iPEndPoint));
     }
 
 

@@ -38,7 +38,7 @@ public class ChatClient : TcpClient
 
             Debug.WriteLine("Connected to server.");
 
-            OnClientConnected(Stream);
+            OnClientConnected(Stream, iPEndPoint);
         }
         catch (ObjectDisposedException ex)
         {
@@ -134,9 +134,9 @@ public class ChatClient : TcpClient
     }
 
 
-    protected virtual void OnClientConnected(NetworkStream stream)
+    protected virtual void OnClientConnected(NetworkStream stream, IPEndPoint iPEndPoint)
     {
-        ClientConnected?.Invoke(this, new ClientConnectedEventArgs(stream));
+        ClientConnected?.Invoke(this, new ClientConnectedEventArgs(stream, iPEndPoint));
     }
 
     public event EventHandler<ClientConnectedEventArgs>? ClientConnected;
