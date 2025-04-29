@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace TCPChatGUI.Connection;
@@ -7,10 +8,12 @@ namespace TCPChatGUI.Connection;
 public class ClientConnectedEventArgs : EventArgs
 {
     public NetworkStream Stream { get; }
+    public IPEndPoint EndPoint;
 
-    public ClientConnectedEventArgs(NetworkStream stream)
+    public ClientConnectedEventArgs(NetworkStream stream, IPEndPoint endPoint)
     {
         Stream = stream;
+        EndPoint = endPoint;
     }
 }
 
