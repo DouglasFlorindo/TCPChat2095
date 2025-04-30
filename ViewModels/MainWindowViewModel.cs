@@ -142,8 +142,10 @@ public partial class MainWindowViewModel : ViewModelBase
     private async void OnClientConnected(object? sender, ClientConnectedEventArgs e)
     {
         var connection = new ChatConnection(e.Stream, e.EndPoint);
-        // TODO: lógica de remoção de conexões; instanciar novo cliente;
+        // TODO: lógica de remoção de conexões;
         Connections.Add(connection);
+        ClientConnected?.Invoke(this, connection);
+
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
@@ -190,5 +192,9 @@ public partial class MainWindowViewModel : ViewModelBase
         _clients.Add(newClient);
         return newClient;
     }
+
+
+    public event EventHandler<ChatConnection>? ClientConnected;
+
 
 }
