@@ -55,6 +55,7 @@ public partial class ChatViewModel : ViewModelBase
     }
 
 
+    public EventHandler<TextReceivedEventArgs>? TextReceived;
 
 
 
