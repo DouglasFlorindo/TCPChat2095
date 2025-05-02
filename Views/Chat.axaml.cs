@@ -17,11 +17,8 @@ public partial class Chat : ClassicWindow
         
         InitializeComponent();
         ViewModel = new(chatConnection);
-        DataContext = ViewModel;
-        
+        DataContext = ViewModel;        
     }
 
-    public void OnTextReceived(object? sender, TextReceivedEventArgs e)
-    {}
 
 }
