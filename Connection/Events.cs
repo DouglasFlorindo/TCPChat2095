@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using TCPChatGUI.Models;
 
 namespace TCPChatGUI.Connection;
 
@@ -25,3 +26,12 @@ public class TextReceivedEventArgs(string text) : EventArgs
 }
 
 
+public class DataReceivedEventArgs(byte[] data) : EventArgs
+{
+    public byte[] Data { get; } = data;
+}
+
+public class MessageReceivedEventArgs(Message message) : EventArgs
+{
+    public Message Message { get; } = message;
+}
