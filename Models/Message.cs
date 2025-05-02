@@ -1,18 +1,16 @@
-
 using System;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace TCPChatGUI.Models;
 
 /// <summary>
 /// Model da mensagem.
 /// </summary>
-public partial class Message : ObservableObject
+public class Message
 {
-    public string? Content;
+    public string? Content { get; set; }
 
-    public string? Username;
+    public string? Username { get; set; }
 
-    public DateTime? Time;
- 
+    public DateTime? Time { get; set; }
+
 }
