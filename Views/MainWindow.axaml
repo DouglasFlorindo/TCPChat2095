@@ -3,11 +3,15 @@
         xmlns:vm="using:TCPChatGUI.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Width="400" Height="500" Padding="4"
+        mc:Ignorable="d" Width="350" Height="400" Padding="4"
+        MaxWidth="350" MaxHeight="400"
+        MinWidth="350" MinHeight="400"
+        ResizeMode="NoResize"
+        WindowState="Normal"
         x:Class="TCPChatGUI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="TCPChatGUI"
+        Title="TCPChat2095"
         Theme="{StaticResource ClassicWindow}">
 
     <Design.DataContext>
@@ -15,36 +19,51 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-<!-- 
-    <TextBlock Text="Text" HorizontalAlignment="Center" VerticalAlignment="Center"/> -->
-    <StackPanel>
 
-        <TextBox Text="{Binding InputIPString}"
-            Watermark="000.0.0.0"></TextBox> 
-        <TextBox Text="{Binding InputPortString}" 
-            Watermark="00000"></TextBox>
-        <Button Command="{Binding ConnectCommand}">Connect</Button>
+    
+    <Grid Height="300" Width="300" RowDefinitions="100,*, *">
+
+        <StackPanel Height="100" Width="300" Grid.Row="0">
+
+            <Image Height="100" Width="300" 
+         Source="/Assets/banner.png"/>
+        </StackPanel>
+        
+        <StackPanel VerticalAlignment="Center" Grid.Row="1">
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"                         HorizontalAlignment="Center"
+                Margin="10">
+                <TextBlock VerticalAlignment="Center" Margin="5">IP: </TextBlock>
+                <TextBox Width="125" 
+                    Text="{Binding InputIPString}"
+                    Watermark="000.0.0.0" Margin="0, 0, 10, 0">
+                </TextBox> 
+                <TextBlock VerticalAlignment="Center" Margin="10, 0, 5, 0">Port: </TextBlock>
+                <TextBox Width="50" Text="{Binding InputPortString}" 
+                    Watermark="00000">
+                </TextBox>
+            </StackPanel>
+            <Button Width="110" Margin="5"  Command="{Binding ConnectCommand}">Connect to user</Button>
+
+        </StackPanel>
 
 
 
-    <TextBlock Text="{Binding IpLabel}"></TextBlock>
-    <TextBlock Text="{Binding PortLabel}"></TextBlock>
-    <Button Command="{Binding InitializeServerCommand}">Initialize Server</Button>
-
-
-
-
-    <!-- <Grid Margin="5" 
-    ColumnDefinitions="120, 100" 
-    RowDefinitions="Auto, Auto, Auto">
-    <Label Grid.Row="0" Grid.Column="0" Margin="10">Celsius</Label>
-    <TextBox Name="Celsius" Grid.Row="0" Grid.Column="1" Margin="0 5" Text="0" TextChanged="TextBox_OnTextChanged"/>
-    <Label Grid.Row="1" Grid.Column="0" Margin="10">Fahrenheit</Label>
-    <TextBox IsReadOnly="True" Name="Fahrenheit" Grid.Row="1"  Grid.Column="1" Margin="0 5" Text="0"/>
-    <Button Grid.Row="2"  Grid.Column="1" Click="Button_OnClick">Calculate</Button>
-</Grid> -->
-
-    </StackPanel>
+        <StackPanel Grid.Row="2">
+  
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                <TextBlock >My IP: </TextBlock>
+                <TextBlock FontWeight="Bold" Margin="5, 0, 10, 0" Text="{Binding IpLabel}"></TextBlock>
+                <TextBlock Margin="10, 0, 0, 0">My Port: </TextBlock>
+                <TextBlock FontWeight="Bold" Margin="5, 0, 0, 0"  Text="{Binding PortLabel}"></TextBlock>
+                
+            </StackPanel>
+            <Button Margin="5" Width="130" Command="{Binding InitializeServerCommand}">Become available</Button>
+            <TextBlock TextAlignment="Center" TextWrapping="Wrap" Margin="5">Becoming available allows you to host chats. <LineBreak/> (other users will be able to connect to you)</TextBlock>
+ 
+        </StackPanel>
+    </Grid>
+    
 
 </Window>
 
