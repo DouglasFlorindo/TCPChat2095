@@ -11,17 +11,17 @@ namespace TCPChatGUI.Views;
 
 public partial class Chat : ClassicWindow
 {
+    private readonly ChatViewModel ViewModel;
 
     public Chat(ChatConnection chatConnection) {;
         
         InitializeComponent();
-        DataContext = new ChatViewModel(chatConnection);
-            
+        ViewModel = new(chatConnection);
+        DataContext = ViewModel;
         
     }
 
-    public Chat() {
-        InitializeComponent();
-    }
+    public void OnTextReceived(object? sender, TextReceivedEventArgs e)
+    {}
 
 }
