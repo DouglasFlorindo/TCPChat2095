@@ -32,19 +32,18 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- This TextBox can be used to add new ToDoItems -->
         <TextBox Grid.Row="2"
          Text="{Binding NewMessageContent}"
          Watermark="Add a new Message">
             <TextBox.InnerRightContent>
-                <Button Command="{Binding AddMessageCommand}" >
+                <Button Command="{Binding SendMessageCommand}" >
                     Send
                 <!-- <PathIcon Data="{DynamicResource AcceptIconData}" Foreground="Green" /> -->
                 </Button>
             </TextBox.InnerRightContent>
     <!--      KeyBindings allow us to define keyboard gestures  -->
             <TextBox.KeyBindings>
-                <KeyBinding Command="{Binding AddMessageCommand}" Gesture="Enter" />
+                <KeyBinding Command="{Binding SendMessageCommand}" Gesture="Enter" />
             </TextBox.KeyBindings>
         </TextBox>
     </Grid>
