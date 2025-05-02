@@ -45,8 +45,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private string _inputPortString = "11000";
 
 
-    public string IpLabel => $"IP: {Ip}";
-    public string PortLabel => $"Port: {Port}";
+    public string IpLabel => $"{Ip}";
+    public string PortLabel => $"{Port}";
 
 
 
@@ -144,7 +144,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var connection = new ChatConnection(e.Stream, e.EndPoint);
         // TODO: lógica de remoção de conexões;
         Connections.Add(connection);
-        ClientConnected?.Invoke(this, connection);
+        NewChatConnection?.Invoke(this, new NewChatConnectionEventArgs(connection));
 
 
         await Dispatcher.UIThread.InvokeAsync(() =>
@@ -194,7 +194,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
 
-    public event EventHandler<ChatConnection>? ClientConnected;
+    public event EventHandler<NewChatConnectionEventArgs>? NewChatConnection;
 
 
 }
