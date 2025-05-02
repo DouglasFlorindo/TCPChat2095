@@ -6,8 +6,6 @@
         mc:Ignorable="d" Width="350" Height="400" Padding="4"
         MaxWidth="350" MaxHeight="400"
         MinWidth="350" MinHeight="400"
-        ResizeMode="NoResize"
-        WindowState="Normal"
         x:Class="TCPChatGUI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
