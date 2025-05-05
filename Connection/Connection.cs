@@ -14,13 +14,16 @@ namespace TCPChatGUI.Connection;
 /// <summary>
 /// Contém o <see cref="NetworkStream"/> de uma conexão e implementa funções de comunicação entre cliente e servidor. 
 /// </summary>
-public partial class ChatConnection : ObservableObject
+public partial class ChatConnection : ObservableObject, IDisposable
 {
     [ObservableProperty]
     private NetworkStream _stream;
 
     [ObservableProperty]
     private IPEndPoint _connectionEndPoint;
+
+    [ObservableProperty]
+    private Boolean _disposed = false;
 
     private readonly StreamReader _textReader;
 
@@ -31,7 +34,6 @@ public partial class ChatConnection : ObservableObject
     /// </summary>
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    private bool _disposed;
 
 
     public ChatConnection(NetworkStream stream, IPEndPoint endPoint)
@@ -64,12 +66,12 @@ public partial class ChatConnection : ObservableObject
         catch (ObjectDisposedException)
         {
             Debug.WriteLine("Attempted to write in a closed connection");
-            CloseConnection();
+            Dispose();
         }
         catch (IOException ex)
         {
             Debug.WriteLine($"Network write error: {ex.Message}");
-            CloseConnection();
+            Dispose();
         }
         catch (Exception ex)
         {
@@ -121,38 +123,69 @@ public partial class ChatConnection : ObservableObject
         }
         finally
         {
-            CloseConnection();
+            Dispose();
         }
     }
 
 
     public async Task ReadData()
     {
-        var buffer = new Byte[256];
+        var buffer = new byte[256];
 
-        while (!_cancellationTokenSource.Token.IsCancellationRequested)
+        try
         {
-            if (Stream == null || !Stream.CanRead) throw new InvalidOperationException("Stream não está disponível para leitura.");
+            while (!_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                if (Stream == null || !Stream.CanRead) throw new InvalidOperationException("Stream não está disponível para leitura.");
 
-            int bytesRead = await Stream.ReadAsync(buffer);
+                int bytesRead = await Stream.ReadAsync(buffer);
 
-            if (bytesRead == 0) break;
+                if (bytesRead == 0) break;
 
-            var receivedData = new byte[bytesRead];
-            Array.Copy(buffer, receivedData, bytesRead);
+                var receivedData = new byte[bytesRead];
+                Array.Copy(buffer, receivedData, bytesRead);
 
-            DataReceived?.Invoke(this, new DataReceivedEventArgs(receivedData));
+                DataReceived?.Invoke(this, new DataReceivedEventArgs(receivedData));
 
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.WriteLine("Read operation canceled");
+        }
+        catch (IOException ex)
+        {
+            // Lançado quando o leitor não consegue mais ler (conexão fechada).
+            Debug.WriteLine($"Network error: {ex.Message}");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Unexpected error: {ex}");
+        }
+        finally
+        {
+            Dispose();
         }
     }
 
 
-    public async Task WriteData(Byte[] data)
+    public async Task WriteData(byte[] data)
     {
-        if (Stream == null || !Stream.CanWrite) throw new InvalidOperationException("Stream não está disponível para escrita.");
+        // if (Stream == null || !Stream.CanWrite) throw new InvalidOperationException("Stream não está disponível para escrita.");
 
-        await Stream.WriteAsync(data);
-        await Stream.FlushAsync();
+        try
+        {
+            await Stream.WriteAsync(data);
+            await Stream.FlushAsync();
+        }
+        catch (ObjectDisposedException)
+        {
+            Debug.WriteLine("Attempted to write in a closed connection");
+            Dispose();
+            throw;
+        }
+
     }
 
 
@@ -169,16 +202,19 @@ public partial class ChatConnection : ObservableObject
     /// <summary>
     /// Encerra a conexão
     /// </summary>
-    public void CloseConnection()
+    public void Dispose()
     {
-        if (_disposed) return;
+        if (Disposed) return;
 
         try
         {
-            _cancellationTokenSource.Cancel();
+            Debug.WriteLine("Closing connection...");
+            StopReading();
             _textReader.Dispose();
             _textWriter.Dispose();
             Stream.Dispose();
+            Disposed = true;
+            GC.SuppressFinalize(this);
         }
         catch (Exception ex)
         {
@@ -186,7 +222,7 @@ public partial class ChatConnection : ObservableObject
         }
         finally
         {
-            _disposed = true;
+            Disposed = true;
         }
     }
 

@@ -11,6 +11,8 @@ public class Message
 
     public string? Username { get; set; }
 
+    public UserProfile? User { get; set; }
+
     public DateTime? Time { get; set; }
 
 }

@@ -13,9 +13,10 @@ public class ClientConnectedEventArgs(NetworkStream stream, IPEndPoint endPoint)
 }
 
 
-public class NewChatConnectionEventArgs(ChatConnection connection) : EventArgs
+public class NewChatConnectionEventArgs(ChatConnection connection, UserProfile userProfile) : EventArgs
 {
     public ChatConnection Connection { get; } = connection;
+    public UserProfile UserProfile { get; } = userProfile;
 }
 
 
@@ -34,4 +35,10 @@ public class DataReceivedEventArgs(byte[] data) : EventArgs
 public class MessageReceivedEventArgs(Message message) : EventArgs
 {
     public Message Message { get; } = message;
+}
+
+public class ErrorEventArgs(string? errorMessage, Exception? errorException) : EventArgs
+{
+    public string? ErrorMessage { get; } = errorMessage;
+    public Exception? ErrorException { get; } = errorException;
 }

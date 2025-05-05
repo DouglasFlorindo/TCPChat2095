@@ -16,7 +16,6 @@ namespace TCPChatGUI.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
 
-    public ObservableCollection<ChatConnection> Connections { get; } = [];
 
     private readonly ObservableCollection<ChatClient> _clients = [];
 
@@ -44,14 +43,21 @@ public partial class MainWindowViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
     private string _inputPortString = "11000";
 
+    [ObservableProperty]
+    private string _inputUsername = "User";
+
+    public UserProfileViewModel LocalUser;
 
     public string IpLabel => $"{Ip}";
     public string PortLabel => $"{Port}";
+
+    public ObservableCollection<ChatConnection> Connections { get; } = [];
 
 
 
     public MainWindowViewModel()
     {
+        LocalUser = new();
         ChatServer = new ChatServer();
         ChatServer.ClientConnected += OnClientConnected;
     }
@@ -85,16 +91,37 @@ public partial class MainWindowViewModel : ViewModelBase
         var targetEndPoint = new IPEndPoint(ipAddress, port);
 
         // Verifica as conexões existentes.
-        foreach (var connection in Connections)
+        foreach (var connection in Connections.ToList())
         {
+            // Remove conexões descartadas
+            if (connection.Disposed)
+            {
+                DisposeConnection(connection);
+                continue;
+            }
+
             var connEndPoint = connection.ConnectionEndPoint;
             // Não conecta em servidores que já está conectado.
             if (targetEndPoint.Equals(connEndPoint))
             {
-                throw new InvalidOperationException("Already connected to that server.");
+                Error?.Invoke(this, new ErrorEventArgs("Already connected to that server.", null));
+                return;
             }
         }
-        GetAvailableClient().ConnectToServer(ipAddress, port);
+        try
+        {
+            GetAvailableClient().ConnectToServer(ipAddress, port);
+        }
+        catch (SocketException ex)
+        {
+            Error?.Invoke(this, new ErrorEventArgs("Connection error: " + ex.Message, ex));
+        }
+        catch (Exception ex)
+        {
+            Error?.Invoke(this, new ErrorEventArgs("Unexpected error: " + ex.Message, ex));
+        }
+
+
     }
 
 
@@ -111,7 +138,7 @@ public partial class MainWindowViewModel : ViewModelBase
         await ChatServer.AcceptClient();
     }
 
-    
+
     public ChatClient CreateClient()
     {
         var newClient = new ChatClient();
@@ -123,36 +150,20 @@ public partial class MainWindowViewModel : ViewModelBase
     public void DisposeClient(ChatClient client)
     {
         client.ClientConnected -= OnClientConnected;
-        client.Dispose(true);
+        client.Dispose();
         _clients.Remove(client);
     }
 
     public void DisposeServer(ChatServer server)
-    {   
+    {
         server.Dispose();
         server.ClientConnected -= OnClientConnected;
     }
 
-
-    /// <summary>
-    /// Instancia um novo chat contendo a conexão fornecida.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private async void OnClientConnected(object? sender, ClientConnectedEventArgs e)
+    private void DisposeConnection(ChatConnection connection)
     {
-        var connection = new ChatConnection(e.Stream, e.EndPoint);
-        // TODO: lógica de remoção de conexões;
-        Connections.Add(connection);
-        NewChatConnection?.Invoke(this, new NewChatConnectionEventArgs(connection));
-
-
-        await Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            Chat chatWindow = new(connection);
-            chatWindow.Show();
-
-        });
+        connection.Dispose();
+        Connections.Remove(connection);
     }
 
 
@@ -171,11 +182,11 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         // Itera sobre a lista e seleciona um cliente que NÃO esteja conectado e que NÃO esteja morto.
-        foreach (var client in _clients)
+        foreach (var client in _clients.ToList())
         {
             if (!client.Connected)
             {
-                if (client.IsDead)
+                if (client.Disposed)
                 {
                     // Descarta clientes mortos.
                     DisposeClient(client);
@@ -194,7 +205,32 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
 
+    /// <summary>
+    /// Instancia uma nova <see cref="ChatConnection"/> e dispara o evento <see cref="NewChatConnection"/>.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void OnClientConnected(object? sender, ClientConnectedEventArgs e)
+    {
+        var connection = new ChatConnection(e.Stream, e.EndPoint);
+        Connections.Add(connection);
+        NewChatConnection?.Invoke(this, new NewChatConnectionEventArgs(connection, LocalUser.GetUserProfile()));
+
+    }
+
+
+    partial void OnInputUsernameChanged(string value)
+    {
+        LocalUser.UpdateUsername(value);
+
+        Debug.WriteLine($"New username: {LocalUser.Username}");
+    }
+
+
     public event EventHandler<NewChatConnectionEventArgs>? NewChatConnection;
+
+    public event EventHandler<ErrorEventArgs>? Error;
+
 
 
 }

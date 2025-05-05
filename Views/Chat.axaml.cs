@@ -1,24 +1,46 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Classic.Avalonia.Theme;
 using TCPChatGUI.ViewModels;
 using TCPChatGUI.Connection;
-using System.Threading.Tasks;
+using TCPChatGUI.Models;
 using Avalonia.Threading;
+using Avalonia.Controls;
+using System.Diagnostics;
+
 
 namespace TCPChatGUI.Views;
 
 public partial class Chat : ClassicWindow
 {
-    private readonly ChatViewModel ViewModel;
+    private readonly ChatViewModel _viewModel;
 
-    public Chat(ChatConnection chatConnection) {;
-        
+    private readonly UserProfile _localUserProfile;
+
+    public Chat(ChatConnection chatConnection, UserProfile userProfile)
+    {
         InitializeComponent();
-        ViewModel = new(chatConnection);
-        DataContext = ViewModel;        
+        _localUserProfile = userProfile;
+        _viewModel = new(chatConnection, _localUserProfile);
+        DataContext = _viewModel;
+
+        this.Loaded += (_, _) =>
+        {
+            if (DataContext is ChatViewModel vm)
+            {
+                vm.Messages.CollectionChanged += (_, args) =>
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        MessagesScrollViewer?.ScrollToEnd();
+                    });
+                };
+            }
+        };
     }
 
 
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        Debug.WriteLine("Closing chat window...");
+        _viewModel.Dispose();
+    }
 }

@@ -14,6 +14,9 @@ public partial class MessageViewModel : ViewModelBase
     private string? _Username;
 
     [ObservableProperty]
+    private UserProfile? _user;
+
+    [ObservableProperty]
     private DateTime? _Time;
 
     public MessageViewModel()
@@ -25,6 +28,7 @@ public partial class MessageViewModel : ViewModelBase
         Content = message.Content;
         Username = message.Username;
         Time = message.Time;
+        User = message.User;
     }
 
     public Message GetMessage()
@@ -32,6 +36,7 @@ public partial class MessageViewModel : ViewModelBase
         return new Message()
         {
             Content = this.Content,
+            User = this.User,
             Username = this.Username,
             Time = this.Time
         };

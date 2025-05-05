@@ -8,14 +8,15 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
+using TCPChatGUI.Models;
 
 namespace TCPChatGUI.Connection;
 
-public class ChatClient : TcpClient
+public class ChatClient : TcpClient, IDisposable
 {
-    private bool _isDead = false;
+    private bool _disposed = false;
 
-    public bool IsDead {get => _isDead;}
+    public bool Disposed {get => _disposed;}
    
     /// <summary>
     /// Tenta se conectar a um socket TCP específico (servidor).
@@ -49,6 +50,7 @@ public class ChatClient : TcpClient
         catch (SocketException ex) when (ex.SocketErrorCode == SocketError.HostUnreachable)
         {
             Debug.WriteLine("Tried connecting to an unreachable server.");
+            throw;
         }
         catch (SocketException ex)
         {
@@ -59,6 +61,10 @@ public class ChatClient : TcpClient
         {
             Debug.WriteLine($"Error connecting to server: \n{ex}");
             throw;
+        }
+        finally 
+        {
+            Dispose();
         }
 
     }
@@ -83,10 +89,13 @@ public class ChatClient : TcpClient
         ConnectToServer(new IPEndPoint(iPAddress, port));
     }
 
-    new public void Dispose(bool disposing)
+    new public void Dispose()
     {
-        _isDead = true;
-        base.Dispose(disposing);
+        if (Disposed) return;
+
+            
+        _disposed = true;
+        GC.SuppressFinalize(this);
     }
 
 

@@ -7,7 +7,7 @@
         Width="400" Height="500" Padding="4"
         x:Class="TCPChatGUI.Views.Chat"
         x:DataType="vm:ChatViewModel"
-        Title="Chatting with [user]"
+        Title="{Binding WindowTitle}"
         Theme="{StaticResource ClassicWindow}">
 
 
@@ -15,15 +15,15 @@
     <Grid RowDefinitions="Auto, *, Auto"
           x:Name="Root">
 
-        <ScrollViewer Grid.Row="1" Background="#008282" Margin="0, 4" Padding="4">
+        <ScrollViewer x:Name="MessagesScrollViewer" Grid.Row="1" Background="#008282" Margin="0, 4">
             <!-- This ItemsControl show all added ToDoItems. -->
             <!-- It needs to be placed inside a ScrollViewer because other than a ListBox it has not its own -->
             <ItemsControl ItemsSource="{Binding Messages}">
                 <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <StackPanel Margin="0,4">
-                    <TextBlock Text="{Binding Username}" FontWeight="Bold" Foreground="White" />
-                    <TextBlock Text="{Binding Content}" Foreground="White" />
+                <StackPanel Margin="4">
+                    <TextBlock Text="{Binding User.Username}" FontWeight="Bold" Foreground="White" />
+                    <TextBlock TextWrapping="Wrap" Text="{Binding Content}" Foreground="White" />
                     <TextBlock Text="{Binding Time, StringFormat='HH:mm:ss'}" 
                               Foreground="White" FontSize="8" />
                 </StackPanel>

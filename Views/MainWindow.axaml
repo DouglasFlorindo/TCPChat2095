@@ -3,42 +3,47 @@
         xmlns:vm="using:TCPChatGUI.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Width="350" Height="400" Padding="4"
-        MaxWidth="350" MaxHeight="400"
-        MinWidth="350" MinHeight="400"
+        mc:Ignorable="d" Width="350" Height="450" Padding="4"
+        MaxWidth="350" MaxHeight="450"
+        MinWidth="350" MinHeight="450"
         x:Class="TCPChatGUI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="TCPChat2095"
         Theme="{StaticResource ClassicWindow}">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
 
     
-    <Grid Height="300" Width="300" RowDefinitions="100,*, *">
+    <Grid Height="400" Width="300" RowDefinitions="100,*, *">
 
-        <StackPanel Height="100" Width="300" Grid.Row="0">
+        <StackPanel Height="100" Width="300" Margin="0, 0, 0, 0" Grid.Row="0">
 
             <Image Height="100" Width="300" 
          Source="/Assets/banner.png"/>
         </StackPanel>
         
-        <StackPanel VerticalAlignment="Center" Grid.Row="1">
-
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"                         HorizontalAlignment="Center"
+        <StackPanel VerticalAlignment="Center" Grid.Row="1" Margin="0, 0, 0, 10">
+            
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center"
                 Margin="10">
                 <TextBlock VerticalAlignment="Center" Margin="5">IP: </TextBlock>
                 <TextBox Width="125" 
                     Text="{Binding InputIPString}"
                     Watermark="000.0.0.0" Margin="0, 0, 10, 0">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Command="{Binding ConnectCommand}" Gesture="Enter" />
+                    </TextBox.KeyBindings>
                 </TextBox> 
                 <TextBlock VerticalAlignment="Center" Margin="10, 0, 5, 0">Port: </TextBlock>
                 <TextBox Width="50" Text="{Binding InputPortString}" 
                     Watermark="00000">
+                    <TextBox.KeyBindings>
+                        <KeyBinding Command="{Binding ConnectCommand}" Gesture="Enter" />
+                    </TextBox.KeyBindings>
                 </TextBox>
             </StackPanel>
             <Button Width="110" Margin="5"  Command="{Binding ConnectCommand}">Connect to user</Button>
@@ -46,16 +51,25 @@
         </StackPanel>
 
 
-
+        <!-- Local stuff -->
         <StackPanel Grid.Row="2">
-  
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5">
+                <TextBlock VerticalAlignment="Center" Margin="0, 0, 5, 0">My <Bold>username</Bold> is: </TextBlock>
+                <TextBox TextAlignment="Center" Width="100" 
+                    Text="{Binding InputUsername, Mode=TwoWay}"
+                    Margin="5, 0, 0, 0">
+                </TextBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 0, 0, 10">
                 <TextBlock >My IP: </TextBlock>
                 <TextBlock FontWeight="Bold" Margin="5, 0, 10, 0" Text="{Binding IpLabel}"></TextBlock>
                 <TextBlock Margin="10, 0, 0, 0">My Port: </TextBlock>
                 <TextBlock FontWeight="Bold" Margin="5, 0, 0, 0"  Text="{Binding PortLabel}"></TextBlock>
                 
             </StackPanel>
+            
             <Button Margin="5" Width="130" Command="{Binding InitializeServerCommand}">Become available</Button>
             <TextBlock TextAlignment="Center" TextWrapping="Wrap" Margin="5">Becoming available allows you to host chats. <LineBreak/> (other users will be able to connect to you)</TextBlock>
  
