@@ -11,7 +11,9 @@ public static class NetworkUtils
         foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
         {
             if (ni.OperationalStatus != OperationalStatus.Up ||
-                ni.NetworkInterfaceType == NetworkInterfaceType.Loopback)
+                ni.NetworkInterfaceType == NetworkInterfaceType.Loopback ||
+                ni.NetworkInterfaceType == NetworkInterfaceType.Ppp ||
+                ni.Description.Contains("VPN", StringComparison.OrdinalIgnoreCase))
                 continue;
 
             var ipProps = ni.GetIPProperties();
@@ -19,7 +21,11 @@ public static class NetworkUtils
             {
                 if (addr.Address.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    return addr.Address;
+                    if (!IPAddress.IsLoopback(addr.Address) &&
+                        !addr.Address.ToString().StartsWith("169.254."))
+                    {
+                        return addr.Address;
+                    }
                 }
             }
         }
