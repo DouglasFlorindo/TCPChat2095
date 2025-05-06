@@ -11,13 +11,10 @@
         Theme="{StaticResource ClassicWindow}">
 
 
-    <!-- We give a name to the root grid in order to access it later -->
     <Grid RowDefinitions="Auto, *, Auto"
           x:Name="Root">
 
         <ScrollViewer x:Name="MessagesScrollViewer" Grid.Row="1" Background="#008282" Margin="0, 4">
-            <!-- This ItemsControl show all added ToDoItems. -->
-            <!-- It needs to be placed inside a ScrollViewer because other than a ListBox it has not its own -->
             <ItemsControl ItemsSource="{Binding Messages}">
                 <ItemsControl.ItemTemplate>
             <DataTemplate>
@@ -41,7 +38,6 @@
                 <!-- <PathIcon Data="{DynamicResource AcceptIconData}" Foreground="Green" /> -->
                 </Button>
             </TextBox.InnerRightContent>
-    <!--      KeyBindings allow us to define keyboard gestures  -->
             <TextBox.KeyBindings>
                 <KeyBinding Command="{Binding SendMessageCommand}" Gesture="Enter" />
             </TextBox.KeyBindings>

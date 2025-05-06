@@ -104,7 +104,7 @@ public partial class MainWindowViewModel : ViewModelBase
             // Não conecta em servidores que já está conectado.
             if (targetEndPoint.Equals(connEndPoint))
             {
-                Error?.Invoke(this, new ErrorEventArgs("Already connected to that server.", null));
+                Error?.Invoke(this, new ErrorEventArgs("Already connected to that user.", null));
                 return;
             }
         }
@@ -222,15 +222,10 @@ public partial class MainWindowViewModel : ViewModelBase
     partial void OnInputUsernameChanged(string value)
     {
         LocalUser.UpdateUsername(value);
-
-        Debug.WriteLine($"New username: {LocalUser.Username}");
     }
 
 
     public event EventHandler<NewChatConnectionEventArgs>? NewChatConnection;
 
     public event EventHandler<ErrorEventArgs>? Error;
-
-
-
 }

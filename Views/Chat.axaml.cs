@@ -5,6 +5,7 @@ using TCPChatGUI.Models;
 using Avalonia.Threading;
 using Avalonia.Controls;
 using System.Diagnostics;
+using System;
 
 
 namespace TCPChatGUI.Views;
@@ -22,25 +23,38 @@ public partial class Chat : ClassicWindow
         _viewModel = new(chatConnection, _localUserProfile);
         DataContext = _viewModel;
 
-        this.Loaded += (_, _) =>
+        Loaded += (_, _) =>
         {
-            if (DataContext is ChatViewModel vm)
+            _viewModel.Error += OnError;
+            _viewModel.Messages.CollectionChanged += (_, args) =>
             {
-                vm.Messages.CollectionChanged += (_, args) =>
-                {
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        MessagesScrollViewer?.ScrollToEnd();
-                    });
-                };
-            }
+                Dispatcher.UIThread.InvokeAsync(() => MessagesScrollViewer?.ScrollToEnd());
+            };
         };
+    }
+
+
+    public void OnError(object? sender, ErrorEventArgs e)
+    {
+        try
+        {
+            // Exibe janela de erro somente se o evento contém mensagem de erro.
+            if (string.IsNullOrEmpty(e.ErrorMessage)) return;
+            var errorWindow = new Error(e.ErrorMessage);
+            errorWindow.ShowDialog(this);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error displaying error window: {ex}");
+        }
     }
 
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
         Debug.WriteLine("Closing chat window...");
+        _viewModel.Error -= OnError;
         _viewModel.Dispose();
+        base.OnClosing(e);
     }
 }

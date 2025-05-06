@@ -156,13 +156,16 @@ public partial class ChatViewModel : ViewModelBase
             await _chatConnection.WriteData(dataToSend);
         }
         catch (ObjectDisposedException ex)
-        {
-            Error?.Invoke(this, new ErrorEventArgs("This connection is no longer available.", ex));
+        {   
+            Debug.WriteLine(ex);
+            Error?.Invoke(this, new ErrorEventArgs($"Your connection with [{RemoteUserProfile.Username}] is no longer available.", ex));
             Dispose();
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error sending message asynchronously: {ex}");
+            Error?.Invoke(this, new ErrorEventArgs("Your last message was not sent correctly.", ex));
+
         }
     }
 
@@ -239,8 +242,6 @@ public partial class ChatViewModel : ViewModelBase
             await _chatConnection.WriteText(input);
         }
     }
-
-
     // public event EventHandler<TextReceivedEventArgs>? TextReceived;
 
     public event EventHandler<MessageReceivedEventArgs>? MessageReceived;
