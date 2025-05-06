@@ -3,13 +3,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:vm="using:TCPChatGUI.ViewModels"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="150"
+        Width="400" Height="150"
+        MaxWidth="400" MaxHeight="150"
+        MinWidth="400" MinHeight="150"
         x:Class="TCPChatGUI.Views.Error"
         x:DataType="vm:ErrorViewModel"
         Title="Error"
         Theme="{StaticResource ClassicWindow}">
-    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap"></TextBlock>
-        <Button>Ok</Button>
-    </StackPanel>
+    <DockPanel VerticalAlignment="Center" Margin="20">
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="40, *" VerticalAlignment="Center">
+            <Image Grid.Column="0" Height="40" Width="40" Source="/Assets/Warning.ico" VerticalAlignment="Top"/>
+            <TextBlock Grid.Column="1" Text="{Binding ErrorMessage}" TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0"/>
+        </Grid>
+        <Button DockPanel.Dock="Bottom" Width="80" HorizontalAlignment="Center" Margin="0,20,0,0" Click="OkButton_OnClick">Ok</Button>
+    </DockPanel>
 </Window>

@@ -5,6 +5,7 @@ using TCPChatGUI.Models;
 using Avalonia.Threading;
 using Avalonia.Controls;
 using System.Diagnostics;
+using Avalonia.Interactivity;
 
 namespace TCPChatGUI.Views;
 
@@ -23,5 +24,10 @@ public partial class Error : ClassicWindow
         InitializeComponent();
         _viewModel = new(errorMessage);
         DataContext = _viewModel;
+    }
+
+    private void OkButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }
