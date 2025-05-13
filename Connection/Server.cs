@@ -131,7 +131,7 @@ public partial class ChatServer : ObservableObject, IDisposable
         ConfigureKeepAlive(client.Client);
         _clients.Add(client);
         var stream = client.GetStream();
-        OnClientConnected(stream, _endPoint);
+        ClientConnected?.Invoke(this, new ClientConnectedEventArgs(stream, _endPoint));
     }
 
 
@@ -177,13 +177,6 @@ public partial class ChatServer : ObservableObject, IDisposable
         socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, tcpKeepIdle);
         socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, tcpKeepCnt);
     }
-
-
-    protected virtual void OnClientConnected(NetworkStream stream, IPEndPoint iPEndPoint)
-    {
-        ClientConnected?.Invoke(this, new ClientConnectedEventArgs(stream, iPEndPoint));
-    }
-
 
     public event EventHandler<ClientConnectedEventArgs>? ClientConnected;
 }

@@ -5,7 +5,7 @@ namespace TCPChatGUI.ViewModels;
 public partial class ErrorViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private string _errorMessage = "Lorem ipsum dolor sit amet";
+    private string _errorMessage = string.Empty;
 
     public ErrorViewModel()
     {

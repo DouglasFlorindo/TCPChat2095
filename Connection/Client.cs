@@ -32,14 +32,14 @@ public class ChatClient : TcpClient, IDisposable
         Debug.WriteLine($"Connecting to {iPEndPoint.Address}:{iPEndPoint.Port}...");
         
         try
-        {
+        { 
             Client.Connect(iPEndPoint);
             NetworkStream Stream = GetStream();
             ConfigureKeepAlive(Client);
 
             Debug.WriteLine("Connected to server.");
 
-            OnClientConnected(Stream, iPEndPoint);
+            ClientConnected?.Invoke(this, new ClientConnectedEventArgs(Stream, iPEndPoint));
         }
         catch (ObjectDisposedException ex)
         {
@@ -140,12 +140,6 @@ public class ChatClient : TcpClient, IDisposable
         socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveInterval, tcpKeepIntvl);
         socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, tcpKeepIdle);
         socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, tcpKeepCnt);
-    }
-
-
-    protected virtual void OnClientConnected(NetworkStream stream, IPEndPoint iPEndPoint)
-    {
-        ClientConnected?.Invoke(this, new ClientConnectedEventArgs(stream, iPEndPoint));
     }
 
     public event EventHandler<ClientConnectedEventArgs>? ClientConnected;
