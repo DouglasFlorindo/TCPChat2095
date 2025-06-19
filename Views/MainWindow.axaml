@@ -69,8 +69,16 @@
                 <TextBlock FontWeight="Bold" Margin="5, 0, 0, 0"  Text="{Binding PortLabel}"></TextBlock>
                 
             </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,0">
+                <TextBlock VerticalAlignment="Center" Margin="0, 0, 5, 0">Status: </TextBlock>
+                <TextBlock FontWeight="Bold" Margin="5, 0, 0, 0"  Text="{Binding StatusLabel}">
+                </TextBlock>
+            </StackPanel>
             
-            <Button Margin="5" Width="130" Command="{Binding InitializeServerCommand}">Become available</Button>
+            <Button Margin="5" Width="130" 
+            Command="{Binding ToggleServerAvailabilityCommand}"
+            Content="{Binding BecomeAvailableButtonLabel}" />
             <TextBlock TextAlignment="Center" TextWrapping="Wrap" Margin="5">Becoming available allows you to host chats. <LineBreak/> (other users will be able to connect to you)</TextBlock>
  
         </StackPanel>

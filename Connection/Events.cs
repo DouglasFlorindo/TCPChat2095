@@ -6,10 +6,15 @@ using TCPChatGUI.Models;
 namespace TCPChatGUI.Connection;
 
 
+public class ServerStatusChangedEventArgs(bool available) : EventArgs
+{
+    public bool Available { get; } = available;
+}
+
 public class ClientConnectedEventArgs(NetworkStream stream, IPEndPoint endPoint) : EventArgs
 {
     public NetworkStream Stream { get; } = stream;
-    public IPEndPoint EndPoint = endPoint;
+    public IPEndPoint EndPoint { get; } = endPoint;
 }
 
 

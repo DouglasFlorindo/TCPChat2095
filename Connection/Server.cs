@@ -18,6 +18,22 @@ public partial class ChatServer : ObservableObject, IDisposable
 
     private bool _disposed;
 
+    private bool _available;
+
+    public bool ListenerCreated { get; private set; } = false;
+    public bool Available
+    {
+        get => _available;
+        private set
+        {
+            if (_available != value)
+            {
+                _available = value;
+                ServerStatusChanged?.Invoke(this, new ServerStatusChangedEventArgs(value));
+            }
+        }
+    }
+
     public IPAddress? ServerIp { get => _endPoint.Address; }
 
     public int? ServerPort { get => _endPoint.Port; }
@@ -28,7 +44,7 @@ public partial class ChatServer : ObservableObject, IDisposable
     }
 
     /// <summary>
-    /// Inicia um <see cref="TcpListener"/> no IP local da máquina.
+    /// Cria um <see cref="TcpListener"/> no IP local da máquina.
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException">Nenhum port está disponível.</exception>
@@ -53,8 +69,9 @@ public partial class ChatServer : ObservableObject, IDisposable
 
             try
             {
-                _listener.Start();
+                StartServer();
                 isBound = true;
+                ListenerCreated = true;
             }
             catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
             {
@@ -70,13 +87,64 @@ public partial class ChatServer : ObservableObject, IDisposable
     }
 
     /// <summary>
+    /// Inicia o <see cref="TcpListener"/>.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void StartServer()
+    {
+        Debug.WriteLine($"Starting server...");
+        if (_listener == null)
+            throw new InvalidOperationException("Server was not initialized yet.");
+        try
+        {
+            _listener.Start();
+            Available = true;
+
+            _ = AcceptClient();
+        }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+        {
+            throw;
+        }
+        catch (System.Exception)
+        {
+            // TODO
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Interrompe o <see cref="TcpListener"/>.
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void StopServer()
+    {
+        Debug.WriteLine($"Stopping server...");
+        if (_listener == null)
+            throw new InvalidOperationException("Server was not initialized yet.");
+        try
+        {
+            _listener.Stop();
+            Available = false;
+
+        }
+        catch (System.Exception)
+        {
+            // TODO
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Entra em um loop para aguardar a conexão de clientes.
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     public async Task AcceptClient()
     {
-        while (true)
+        while (Available == true)
         {
             if (_listener == null)
                 throw new InvalidOperationException("Server was not created yet.");
@@ -101,8 +169,6 @@ public partial class ChatServer : ObservableObject, IDisposable
                 break;
                 throw;
             }
-
-
         }
     }
 
@@ -111,7 +177,7 @@ public partial class ChatServer : ObservableObject, IDisposable
     {
         if (!_disposed)
         {
-            _listener?.Stop();
+            StopServer();
             foreach (var client in _clients)
                 client.Dispose();
             _disposed = true;
@@ -179,5 +245,7 @@ public partial class ChatServer : ObservableObject, IDisposable
     }
 
     public event EventHandler<ClientConnectedEventArgs>? ClientConnected;
+
+    public event EventHandler<ServerStatusChangedEventArgs>? ServerStatusChanged;
 }
 

@@ -13,6 +13,7 @@ using TCPChatGUI.Connection;
 using TCPChatGUI.Views;
 
 namespace TCPChatGUI.ViewModels;
+
 public partial class MainWindowViewModel : ViewModelBase
 {
 
@@ -46,10 +47,21 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string _inputUsername = "User";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(BecomeAvailableButtonLabel))]
+    [NotifyPropertyChangedFor(nameof(StatusLabel))]
+    private bool _serverAvailable;
+
     public UserProfileViewModel LocalUser;
 
-    public string IpLabel => $"{Ip}";
-    public string PortLabel => $"{Port}";
+    public string IpLabel => Ip?.ToString() ?? "N/A";
+    public string PortLabel => Port?.ToString() ?? "N/A";
+
+
+    public string StatusLabel => ServerAvailable ? "Available" : "Unavailable";
+
+    public string BecomeAvailableButtonLabel => ServerAvailable ? "Become unavailable" : "Become available";
+
 
     public ObservableCollection<ChatConnection> Connections { get; } = [];
 
@@ -60,6 +72,7 @@ public partial class MainWindowViewModel : ViewModelBase
         LocalUser = new();
         ChatServer = new ChatServer();
         ChatServer.ClientConnected += OnClientConnected;
+        ChatServer.ServerStatusChanged += OnServerStatusChanged;
     }
 
 
@@ -126,16 +139,54 @@ public partial class MainWindowViewModel : ViewModelBase
 
 
     /// <summary>
-    /// Cria o servidor, exibe o IP e port na interface e inicia a Task <see cref="ChatServer.AcceptClient"/>
+    /// 
     /// </summary>
     /// <returns></returns>
     [RelayCommand]
-    public async Task InitializeServer()
+    public async Task ToggleServerAvailability()
+    {
+        if (!ChatServer.ListenerCreated)
+        {
+            await CreateServer();
+            return;
+        }
+
+        // Interrompe o servidor caso esteja disponível e vice-versa.
+        if (ChatServer.Available)
+        {
+            try
+            {
+                ChatServer.StopServer();
+                ServerAvailable = false;
+            }
+            catch (Exception ex)
+            {
+                Error?.Invoke(this, new ErrorEventArgs("Unexpected error while toggling availability: " + ex.Message, ex));
+            }
+        }
+        else
+        {
+            try
+            {
+                ChatServer.StartServer();
+                ServerAvailable = true;
+            }
+            catch (Exception ex)
+            {
+                Error?.Invoke(this, new ErrorEventArgs("Unexpected error while toggling availability: " + ex.Message, ex));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Cria o servidor, exibe o IP e port na interface e inicia a Task <see cref="ChatServer.AcceptClient"/>
+    /// </summary>
+    /// <returns></returns>
+    public async Task CreateServer()
     {
         await ChatServer.CreateServer();
         Ip = ChatServer.ServerIp;
         Port = ChatServer.ServerPort;
-        await ChatServer.AcceptClient();
     }
 
 
@@ -218,7 +269,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     }
 
+    private void OnServerStatusChanged(object? sender, ServerStatusChangedEventArgs e)
+    {
+        ServerAvailable = e.Available;
+    }
 
+    // Atualiza o nome do usuário no perfil local.
     partial void OnInputUsernameChanged(string value)
     {
         LocalUser.UpdateUsername(value);
